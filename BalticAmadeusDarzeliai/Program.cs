@@ -100,7 +100,7 @@ namespace BalticAmadeusDarzeliai
             var maxPercentage = languagesWithCount.Max(x => x.Item2);
             var indexMaxPercentage = languagesWithCount.FindIndex(x => x.Item2 == maxPercentage);
             var kindergartenName = languagesWithCount[indexMaxPercentage].Item1;
-            TextWriter tw = new StreamWriter("MostFreeSpaces.txt");
+            TextWriter tw = new StreamWriter("MostFreeSpace.txt");
             tw.WriteLine(kindergartenName + " " + maxPercentage.ToString());
             tw.Close();
         }
