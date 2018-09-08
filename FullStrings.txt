@@ -1,2 +1,0 @@
-MAX Kod_1,5-3_Liet
-MIN Ait_1,5-7_Liet
