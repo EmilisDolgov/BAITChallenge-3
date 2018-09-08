@@ -22,12 +22,8 @@ namespace BalticAmadeusDarzeliai
             FindMin(listKindergarten, ref minValue, ref minValueIndex);
             Console.WriteLine("Max CHILDS_COUNT value " + maxValue);
             Console.WriteLine("Min CHILDS_COUNT value " + minValue);
-            var maxString = FullString(maxValueIndex, listKindergarten);
-            var minString = FullString(minValueIndex, listKindergarten);
-            TextWriter tw = new StreamWriter("FullStrings.txt");
-            tw.WriteLine(maxString);
-            tw.WriteLine(minString);
-            tw.Close();
+            FullStringToFile(maxValue, listKindergarten);
+            FullStringToFile(minValue, listKindergarten);
             MaxPercentageToFile(listKindergarten);
             GroupedListToFile(listKindergarten);
         }
@@ -72,21 +68,31 @@ namespace BalticAmadeusDarzeliai
                 }
             }
         }
-        public static string FullString(int index, List<Kindergarten> listKindergarten)
+        public static string FullString(Kindergarten kindergarten)
         {
-            string label = listKindergarten[index].TYPE_LABEL;
+            string label = kindergarten.TYPE_LABEL;
             StringBuilder builder = new StringBuilder(label);
             builder.Replace("Nuo ", "");
             builder.Replace(" iki ", "-");
             builder.Replace(" metų", "");
             label = builder.ToString();
-            string schoolName = listKindergarten[index].SCHOOL_NAME;
+            string schoolName = kindergarten.SCHOOL_NAME;
             schoolName = schoolName.Substring(0, 3);
-            string lanLabel = listKindergarten[index].LAN_LABEL;
+            string lanLabel = kindergarten.LAN_LABEL;
             lanLabel = lanLabel.Substring(0, 4);
             return schoolName + "_" + label + "_" + lanLabel;
+
         }
-        static void MaxPercentageToFile(List<Kindergarten> listKindergarten)
+        public static void FullStringToFile(int value, List<Kindergarten> kindergartens)
+        {
+            var list = kindergartens.Where(x => x.CHILDS_COUNT == value).ToList();
+            TextWriter tw = new StreamWriter("FullString.txt");
+            foreach (var i in list)
+                tw.WriteLine(FullString(i));
+            tw.Close();
+                
+        }
+        public static void MaxPercentageToFile(List<Kindergarten> listKindergarten)
         {
             var languages = listKindergarten.Select(x => x.LAN_LABEL).Distinct();
             var languagesWithCount = new List<Tuple<string, string>>();
@@ -100,11 +106,11 @@ namespace BalticAmadeusDarzeliai
             var maxPercentage = languagesWithCount.Max(x => x.Item2);
             var indexMaxPercentage = languagesWithCount.FindIndex(x => x.Item2 == maxPercentage);
             var kindergartenName = languagesWithCount[indexMaxPercentage].Item1;
-            TextWriter tw = new StreamWriter("MostFreeSpaces.txt");
+            TextWriter tw = new StreamWriter("MostFreeSpace.txt");
             tw.WriteLine(kindergartenName + " " + maxPercentage.ToString());
             tw.Close();
         }
-        static void GroupedListToFile(List<Kindergarten> listKindergarten)
+        public static void GroupedListToFile(List<Kindergarten> listKindergarten)
         {
             var sortedList = listKindergarten.Where(x => x.FREE_SPACE >= 2 && x.FREE_SPACE <= 4).ToList();
             var groupedList = sortedList.GroupBy(x => x.SCHOOL_NAME).Select(group => new { SchoolName = group.Key, ChildCount = group.Sum(x => x.CHILDS_COUNT), FreeSpace = group.Sum(x => x.FREE_SPACE), Languages = group.Select(x => x.LAN_LABEL).Distinct().ToList() }).ToList();
